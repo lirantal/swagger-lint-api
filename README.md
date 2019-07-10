@@ -30,14 +30,53 @@ npm install --save swagger-lint-api
 
 # Usage
 
+The library exposes validators to be used with an OpenAPI / Swagger JSON-formatted schema:
+
+1. Require the library
+2. Instantiate a new validator based on a schema
+3. Invoke validator methods to validate the schema
+
 ```js
-// @TODO
-const {} = require('swagger-lint-api')
+const {DescriptionValidator} = require('swagger-lint-api')
+
+const swaggerJSON = {}
+const validator = new DescriptionValidator(swaggerJSON)
+
+// Available validators to use:
+validator.descriptionHasNoLineBreaks()
+validator.descriptionHasNoTabs()
+validator.descriptionEndsWithString()
 ```
 
 # Example
 
-<!-- TODO -->
+Using a JSON schema file you want to validate:
+
+```js
+const {DescriptionValidator} = require('swagger-lint-api')
+
+// since it's just a JSON document we can require it into a variable
+// and pass on to the constructor call
+const mySwaggerSchema = require('./swagger-schema.json')
+const validator = new DescriptionValidator(mySwaggerSchema)
+
+// validate
+const result = validator.descriptionHasNoLineBreaks()
+// check result.valid being true or false
+```
+
+Inline JSON validation:
+
+```js
+const {DescriptionValidator} = require('swagger-lint-api')
+
+const someJSON = {description: 'this \n has \nline-breaks'}
+const validator = new DescriptionValidator(someJSON)
+
+// validate for line breaks
+const result = validator.descriptionHasNoLineBreaks()
+// result.valid will be false
+```
 
 # Contributing
 
