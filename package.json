@@ -43,7 +43,6 @@
     "url": "https://github.com/lirantal/swagger-lint-api.git"
   },
   "dependencies": {
-    "@hapi/joi": "^15.1.0",
     "debug": "^4.1.0"
   },
   "devDependencies": {
