@@ -37,7 +37,6 @@ class DescriptionValidator {
     return this._formatResult(result)
   }
 
-  // TODO
   descriptionCompliesWithFunction(customFunction) {
     const result = this._recursivelyFindKeyValueInObjects(
       {
