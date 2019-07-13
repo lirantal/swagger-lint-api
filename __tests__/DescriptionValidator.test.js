@@ -74,4 +74,21 @@ describe('Description field validator', () => {
       expect(result).toEqual({valid: false, path: ['tags', '1', 'description']})
     })
   })
+
+  describe('Description evaluates through custom function', () => {
+    test('a description value have should not include a string', () => {
+      const validator = new DescriptionValidator(SwaggerSchemaMock)
+
+      const funcFindCustomString = stringMatchText => {
+        return stringMatchText.indexOf('Petstore') !== -1
+      }
+
+      const result = validator.descriptionCompliesWithFunction(funcFindCustomString)
+
+      expect(result).toEqual({
+        valid: false,
+        path: ['tags', '0', 'description']
+      })
+    })
+  })
 })

@@ -1,6 +1,6 @@
 'use strict'
 
-const debug = require('debug')('swagger-lint')
+const debug = require('debug')('swagger-lint-api')
 
 class DescriptionValidator {
   constructor(schema) {
@@ -38,7 +38,18 @@ class DescriptionValidator {
   }
 
   // TODO
-  descriptionCompliesWithFunction(callback) {}
+  descriptionCompliesWithFunction(customFunction) {
+    const result = this._recursivelyFindKeyValueInObjects(
+      {
+        key: 'description',
+        keyValidator: customFunction
+      },
+      this.inputSchema,
+      []
+    )
+
+    return this._formatResult(result)
+  }
 
   descriptionEndsWithString(str) {
     const result = this._recursivelyFindKeyValueInObjects(
