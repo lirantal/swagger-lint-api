@@ -13,7 +13,7 @@
   <a href="https://travis-ci.org/lirantal/swagger-lint-api"><img src="https://badgen.net/travis/lirantal/swagger-lint-api" alt="build"/></a>
   <a href="https://codecov.io/gh/lirantal/swagger-lint-api"><img src="https://badgen.net/codecov/c/github/lirantal/swagger-lint-api" alt="codecov"/></a>
   <a href="https://snyk.io/test/github/lirantal/swagger-lint-api"><img src="https://snyk.io/test/github/lirantal/swagger-lint-api/badge.svg" alt="Known Vulnerabilities"/></a>
-  <a href="https://github.com/nodejs/security-wg/blob/master/processes/responsible_disclosure_template.md"><img src="https://img.shields.io/badge/Security-Responsible%20Disclosure-yellow.svg" alt="Security Responsible Disclosure" /></a>
+  <a href="./SECURITY.md"><img src="https://img.shields.io/badge/Security-Responsible%20Disclosure-yellow.svg" alt="Security Responsible Disclosure" /></a>
 </p>
 
 # About
