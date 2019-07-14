@@ -11,9 +11,9 @@ class SchemaUtils {
 
           const ret = validationSchema.keyValidator(value)
           if (ret) {
-            debug(`description key is valid in path: ${path}`)
+            debug(`key ${validationSchema.key} is valid in path: ${path}`)
           } else {
-            debug(`description key is invalid in path: ${path}`)
+            debug(`key ${validationSchema.key} is invalid in path: ${path}`)
             return {
               valid: false,
               path: path.concat(key)

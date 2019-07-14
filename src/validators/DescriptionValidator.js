@@ -1,6 +1,7 @@
 'use strict'
 
-const debug = require('debug')('swagger-lint-api')
+const SchemaUtils = require('../utils/SchemaUtils')
+const ValidatorsUtils = require('../utils/ValidatorsUtils')
 
 class DescriptionValidator {
   constructor(schema) {
@@ -8,7 +9,7 @@ class DescriptionValidator {
   }
 
   descriptionHasNoLineBreaks() {
-    const result = this._recursivelyFindKeyValueInObjects(
+    const result = SchemaUtils.recursivelyFindKeyValueInObjects(
       {
         key: 'description',
         keyValidator: value => {
@@ -19,11 +20,11 @@ class DescriptionValidator {
       []
     )
 
-    return this._formatResult(result)
+    return ValidatorsUtils.formatResults(result)
   }
 
   descriptionHasNoTabs() {
-    const result = this._recursivelyFindKeyValueInObjects(
+    const result = SchemaUtils.recursivelyFindKeyValueInObjects(
       {
         key: 'description',
         keyValidator: value => {
@@ -34,11 +35,11 @@ class DescriptionValidator {
       []
     )
 
-    return this._formatResult(result)
+    return ValidatorsUtils.formatResults(result)
   }
 
   descriptionCompliesWithFunction(customFunction) {
-    const result = this._recursivelyFindKeyValueInObjects(
+    const result = SchemaUtils.recursivelyFindKeyValueInObjects(
       {
         key: 'description',
         keyValidator: customFunction
@@ -47,11 +48,11 @@ class DescriptionValidator {
       []
     )
 
-    return this._formatResult(result)
+    return ValidatorsUtils.formatResults(result)
   }
 
   descriptionEndsWithString(str) {
-    const result = this._recursivelyFindKeyValueInObjects(
+    const result = SchemaUtils.recursivelyFindKeyValueInObjects(
       {
         key: 'description',
         keyValidator: value => {
@@ -62,47 +63,7 @@ class DescriptionValidator {
       []
     )
 
-    return this._formatResult(result)
-  }
-
-  _recursivelyFindKeyValueInObjects(validationSchema, inputSchema, path) {
-    if (inputSchema && typeof inputSchema === 'object') {
-      for (const [key, value] of Object.entries(inputSchema)) {
-        if (key === validationSchema.key) {
-          debug(`found a ${validationSchema.key} key`)
-
-          const ret = validationSchema.keyValidator(value)
-          if (ret) {
-            debug(`description key is valid in path: ${path}`)
-          } else {
-            debug(`description key is invalid in path: ${path}`)
-            return {
-              valid: false,
-              path: path.concat(key)
-            }
-          }
-        } else {
-          debug(`traversing deeper for key: ${validationSchema.key}`)
-          path.push(key)
-          const ret = this._recursivelyFindKeyValueInObjects(validationSchema, value, path)
-          if (ret) {
-            return ret
-          } else {
-            path.pop()
-          }
-        }
-      }
-    }
-  }
-
-  _formatResult(result) {
-    if (!result) {
-      return {
-        valid: true
-      }
-    }
-
-    return result
+    return ValidatorsUtils.formatResults(result)
   }
 }
 
