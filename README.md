@@ -36,17 +36,17 @@ The library exposes validators to be used with an OpenAPI / Swagger JSON-formatt
 2. Instantiate a new validator based on a schema
 3. Invoke validator methods to validate the schema
 
-```js
-const {DescriptionValidator} = require('swagger-lint-api')
+Available validators to be used
 
-const swaggerJSON = {}
-const validator = new DescriptionValidator(swaggerJSON)
-
-// Available validators to use:
-validator.descriptionHasNoLineBreaks()
-validator.descriptionHasNoTabs()
-validator.descriptionEndsWithString()
-```
+| Validator Class | Validator functions                 | Description                                                                               |
+| --------------- | ----------------------------------- | ----------------------------------------------------------------------------------------- |
+| Description     | descriptionHasNoLineBreaks          | assert no line breaks such as `\n` exist in the string                                    |
+| Description     | descriptionHasNoTabs                | assert no tab control character exist in the string                                       |
+| Description     | descriptionEndsWithString(string)   | assert the string ends with specific string                                               |
+| Description     | descriptionCompliesWithFunction(fn) | pass a custom function which expects a value to return true or false for custom assertion |
+| Paths           | has2xxResponses                     | assert all paths have 2xx HTTP responses                                                  |
+| Paths           | has4xxResponses                     | assert all paths have 4xx HTTP responses                                                  |
+| Paths           | has5xxResponses                     | assert all paths have 5xx HTTP responses                                                  |
 
 # Example
 
