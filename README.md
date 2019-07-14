@@ -18,8 +18,6 @@
 
 # About
 
-swagger-lint-api
-
 Linter for a Swagger JSON API spec
 
 # Install
