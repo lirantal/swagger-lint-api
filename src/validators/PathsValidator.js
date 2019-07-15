@@ -23,6 +23,9 @@ class PathsValidator {
 
   _hasResponseStatusCode(statusCodeMatch) {
     const pathsSchema = this.inputSchema.paths
+    if (!pathsSchema) {
+      debug(`warning: couldn't find valid paths structure in schema`)
+    }
     const result = SchemaUtils.recursivelyFindKeyValueInObjects(
       {
         key: 'responses',
