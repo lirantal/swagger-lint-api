@@ -76,6 +76,52 @@ const result = validator.descriptionHasNoLineBreaks()
 // result.valid will be false
 ```
 
+Using it as a linting for a project:
+
+1. Create a test file to run during lint / CI tests
+2. Assert for expected structure in the Swagger JSON file
+
+See example reference:
+
+```js
+const {PathsValidator} = require('swagger-lint-api')
+const assert = require('assert')
+
+const mySwaggerExample = {
+  swagger: '2.0',
+  host: 'api.superheroes.io',
+  basePath: '/v2',
+  paths: {
+    '/superheroes': {
+      get: {
+        summary: 'Finds superheroes',
+        produces: ['application/json'],
+        responses: {
+          '200': {
+            description: 'successful operation',
+            schema: {
+              type: 'array',
+              items: {
+                $ref: '#/definitions/SuperHeroes'
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+const validator = new PathsValidator(mySwaggerExample)
+const actual = validator.has4xxResponses()
+const expected = {valid: true}
+
+assert.deepStrictEqual(actual, expected)
+// will throw an error and print it on console
+// due to mySwaggerExample object missing a
+// 4xx response type
+```
+
 # Contributing
 
 Please consult [CONTIRBUTING](./CONTRIBUTING.md) for guidelines on contributing to this project.
