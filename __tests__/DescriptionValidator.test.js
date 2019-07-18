@@ -90,5 +90,36 @@ describe('Description field validator', () => {
         path: ['tags', '0', 'description']
       })
     })
+
+    test('custom validator with a more elaborate example should pass', () => {
+      const mockSwagger = JSON.parse(JSON.stringify(SwaggerSchemaMock))
+      mockSwagger['paths']['/pet']['post']['description'] = 'only a Jedi Master can rule this pet'
+
+      const validator = new DescriptionValidator(mockSwagger)
+      const result = validator.descriptionCompliesWithFunction(value => {
+        const allowedWords = ['Jedi Master', 'Zip Code']
+
+        let validationPassed = true
+        allowedWords.forEach(wordToMatch => {
+          // we first of all match the word in the array
+          // eslint-disable-next-line security/detect-non-literal-regexp
+          let regex = new RegExp('\\b' + wordToMatch + '\\b', 'ig')
+          let reResult
+
+          reResult = regex.exec(value)
+          if (reResult !== null) {
+            // if the word exists in the text, it must match case
+            const foundWordMatch = reResult[0]
+            if (foundWordMatch !== wordToMatch) {
+              validationPassed = false
+            }
+          }
+        })
+
+        return validationPassed
+      })
+
+      expect(result).toEqual({valid: true})
+    })
   })
 })
