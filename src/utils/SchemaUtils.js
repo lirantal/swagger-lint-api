@@ -51,12 +51,21 @@ class SchemaUtils {
 
       const ret = validationSchema.keyValidator(value)
 
-      if (!ret) {
+      /* if object, allow for .message, .valid */
+      if(typeof ret === 'object' && !ret.valid && ret.message) {
+        results.push({
+          valid: false,
+          path: m,
+          message:ret.message
+        })
+      } else if (!ret) {
         results.push({
           valid: false,
           path: m
         })
       }
+
+
     })
 
     return results
