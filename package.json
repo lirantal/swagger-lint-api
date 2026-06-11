@@ -1,8 +1,4 @@
 {
-  "publishConfig": {
-    "provenance": true,
-    "access": "public"
-  },
   "name": "swagger-lint-api",
   "version": "0.0.0-development",
   "description": "Linter for a Swagger JSON API spec",
@@ -204,5 +200,9 @@
         }
       ]
     }
+  },
+  "publishConfig": {
+    "provenance": true,
+    "access": "public"
   }
 }
