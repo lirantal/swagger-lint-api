@@ -10,7 +10,7 @@
   <a href="https://www.npmjs.org/package/swagger-lint-api"><img src="https://badgen.net/npm/v/swagger-lint-api" alt="npm version"/></a>
   <a href="https://www.npmjs.org/package/swagger-lint-api"><img src="https://badgen.net/npm/license/swagger-lint-api" alt="license"/></a>
   <a href="https://www.npmjs.org/package/swagger-lint-api"><img src="https://badgen.net/npm/dt/swagger-lint-api" alt="downloads"/></a>
-  <a href="https://travis-ci.org/lirantal/swagger-lint-api"><img src="https://badgen.net/travis/lirantal/swagger-lint-api" alt="build"/></a>
+  <a href="https://github.com/lirantal/swagger-lint-api/actions/workflows/ci.yml"><img src="https://github.com/lirantal/swagger-lint-api/actions/workflows/ci.yml/badge.svg?branch=master" alt="build"/></a>
   <a href="https://codecov.io/gh/lirantal/swagger-lint-api"><img src="https://badgen.net/codecov/c/github/lirantal/swagger-lint-api" alt="codecov"/></a>
   <a href="./SECURITY.md"><img src="https://img.shields.io/badge/Security-Responsible%20Disclosure-yellow.svg" alt="Security Responsible Disclosure" /></a>
 </p>
