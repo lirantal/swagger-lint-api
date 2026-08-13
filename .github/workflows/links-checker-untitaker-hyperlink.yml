@@ -1,0 +1,59 @@
+name: Links Checker (@untitaker/hyperlink)
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  linkChecker:
+    permissions:
+      contents: read
+      issues: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24.x
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts --legacy-peer-deps --engine-strict=false --allow-git=true
+
+      - name: Build docs for hyperlink crawl target
+        run: npm run docs
+
+      - name: Run hyperlink and build report
+        id: hyperlink
+        run: |
+          set +e
+          npx -y @untitaker/hyperlink docs/ --check-anchors --github-actions 2>&1 | tee hyperlink-report.txt
+          exit_code=${PIPESTATUS[0]}
+          set -e
+
+          {
+            echo '# Link Checker Report (@untitaker/hyperlink)'
+            echo ''
+            echo "- Exit code: ${exit_code}"
+            echo '- Target: docs/'
+            echo ''
+            echo '```text'
+            cat hyperlink-report.txt
+            echo '```'
+          } > hyperlink-out.md
+
+          echo "exit_code=${exit_code}" >> "$GITHUB_OUTPUT"
+
+      - name: Create Issue From File
+        if: steps.hyperlink.outputs.exit_code != 0
+        uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6.0.0
+        with:
+          title: Link Checker Report (@untitaker/hyperlink)
+          content-filepath: ./hyperlink-out.md
+          labels: report, automated issue
