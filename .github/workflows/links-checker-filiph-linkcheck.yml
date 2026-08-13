@@ -33,11 +33,23 @@ jobs:
         id: linkcheck
         run: |
           curl -fsSL -o linkcheck.tar.gz https://github.com/filiph/linkcheck/releases/download/3.0.0/linkcheck-3.0.0-linux-x64.tar.gz
+          echo '817629c7077cea9bef4b9d66d5b8d029575e103da3fea9c49d55b45083a8e786  linkcheck.tar.gz' | sha256sum -c -
           tar -xzf linkcheck.tar.gz
           chmod +x linkcheck
 
           python3 -m http.server 8080 --directory . >/tmp/filiph-linkcheck-http.log 2>&1 &
           http_server_pid=$!
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:8080/docs/ >/dev/null; then
+              break
+            fi
+            if [ "$i" -eq 20 ]; then
+              kill "$http_server_pid"
+              echo 'Local docs server did not become ready in time.'
+              exit 1
+            fi
+            sleep 1
+          done
 
           set +e
           ./linkcheck http://127.0.0.1:8080/docs/ -e 2>&1 | tee linkcheck-report.txt
