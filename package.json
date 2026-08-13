@@ -17,7 +17,7 @@
     "coverage:view": "opn coverage/lcov-report/index.html",
     "commit": "git-cz",
     "docs": "npm run docs:code && npm run docs:api",
-    "docs:api": "doxdox *.js --layout bootstrap --output docs/index.html",
+    "docs:api": "mkdir -p docs && doxdox *.js --layout bootstrap --output docs/index.html",
     "docs:code": "echo \"Skipping docco (incompatible with current Node.js/commander versions)\"",
     "build": "echo \"No build step configured\"",
     "lint:markdown": "markdownlint -c .github/.markdownlint.yml -i 'apm_modules/**' -i '.git' -i '__tests__' -i '.github' -i '.changeset' -i 'CODE_OF_CONDUCT.md' -i 'CHANGELOG.md' -i 'docs/**' -i '.superpowers/**' -i 'node_modules' -i 'dist' '**/**.md'",
