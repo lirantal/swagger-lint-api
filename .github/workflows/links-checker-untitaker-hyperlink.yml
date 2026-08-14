@@ -78,6 +78,10 @@ jobs:
 
           echo "exit_code=${exit_code}" >> "$GITHUB_OUTPUT"
 
+      - name: Print hyperlink report
+        if: always()
+        run: cat hyperlink-report.txt
+
       - name: Create Issue From File
         if: steps.hyperlink.outputs.exit_code != 0
         uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6.0.0
