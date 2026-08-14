@@ -1,7 +1,10 @@
 name: Links Checker (@untitaker/hyperlink)
 
 on:
-  repository_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
   workflow_dispatch:
 
 permissions: {}
@@ -10,7 +13,6 @@ jobs:
   linkChecker:
     permissions:
       contents: read
-      issues: write
     runs-on: ubuntu-latest
     steps:
       - name: Check out repo
@@ -26,173 +28,10 @@ jobs:
       - name: Install dependencies
         run: npm install --ignore-scripts --legacy-peer-deps --engine-strict=false --allow-git=true
 
-      - name: Build docs for hyperlink crawl target
+      - name: Build docs
         run: npm run docs
 
-      - name: Run hyperlink and build report
-        id: hyperlink
-        run: |
-          rm -rf .hyperlink-sources
-          mkdir -p .hyperlink-sources
-          rsync -a --prune-empty-dirs \
-            --include='*/' \
-            --include='*.md' \
-            --exclude='.git/' \
-            --exclude='node_modules/' \
-            --exclude='coverage/' \
-            --exclude='.nyc_output/' \
-            --exclude='.next/' \
-            --exclude='.nuxt/' \
-            --exclude='.serverless/' \
-            --exclude='.dynamodb/' \
-            --exclude='.fusebox/' \
-            --exclude='.cache/' \
-            --exclude='bower_components/' \
-            --exclude='jspm_packages/' \
-            --exclude='typings/' \
-            --exclude='.grunt/' \
-            --exclude='lib-cov/' \
-            --exclude='build/Release/' \
-            --exclude='.npm/' \
-            --exclude='.vuepress/dist/' \
-            --exclude='.hyperlink-sources/' \
-            --exclude='*' \
-            ./ .hyperlink-sources/
-
-          set +e
-          npx -y @untitaker/hyperlink docs/ --check-anchors --sources .hyperlink-sources --github-actions 2>&1 | tee hyperlink-report.txt
-          exit_code=${PIPESTATUS[0]}
-          set -e
-
-          python3 <<'PY' > hyperlink-debug.txt
-          from html.parser import HTMLParser
-          from pathlib import Path
-          from urllib.parse import urldefrag, urlparse
-
-          docs_root = Path("docs").resolve()
-          html_files = sorted(docs_root.rglob("*.html"))
-
-          def collect_anchors(path):
-              parser = AnchorCollector()
-              parser.feed(path.read_text(encoding="utf-8", errors="ignore"))
-              return parser.anchors
-
-          class AnchorCollector(HTMLParser):
-              def __init__(self):
-                  super().__init__()
-                  self.anchors = set()
-              def handle_starttag(self, tag, attrs):
-                  attrs = dict(attrs)
-                  for attr in ("id", "name"):
-                      value = attrs.get(attr)
-                      if value:
-                          self.anchors.add(value)
-
-          class LinkCollector(HTMLParser):
-              def __init__(self):
-                  super().__init__()
-                  self.links = []
-              def handle_starttag(self, tag, attrs):
-                  if tag not in ("a", "area"):
-                      return
-                  attrs = dict(attrs)
-                  href = attrs.get("href")
-                  if href:
-                      self.links.append(href.strip())
-
-          anchor_cache = {}
-          def has_anchor(path, anchor):
-              if path not in anchor_cache:
-                  anchor_cache[path] = collect_anchors(path)
-              return anchor in anchor_cache[path]
-
-          rows = []
-          for html_file in html_files:
-              parser = LinkCollector()
-              parser.feed(html_file.read_text(encoding="utf-8", errors="ignore"))
-              for href in parser.links:
-                  parsed = urlparse(href)
-                  if parsed.scheme in ("http", "https"):
-                      rows.append((html_file, href, "SKIP", "external link (not checked by hyperlink)"))
-                      continue
-                  if parsed.scheme:
-                      rows.append((html_file, href, "SKIP", f"unsupported scheme: {parsed.scheme}"))
-                      continue
-
-                  target, anchor = urldefrag(href)
-                  if target == "":
-                      anchor_name = anchor or "<missing>"
-                      if anchor and has_anchor(html_file, anchor):
-                          rows.append((html_file, href, "PASS", f"anchor found in {html_file.relative_to(docs_root)}: #{anchor_name}"))
-                      elif anchor:
-                          rows.append((html_file, href, "FAIL", f"anchor missing in {html_file.relative_to(docs_root)}: #{anchor_name}"))
-                      else:
-                          rows.append((html_file, href, "SKIP", "empty local link"))
-                      continue
-
-                  resolved = (html_file.parent / target).resolve()
-                  try:
-                      resolved.relative_to(docs_root)
-                  except ValueError:
-                      rows.append((html_file, href, "FAIL", "resolves outside docs/"))
-                      continue
-
-                  if not resolved.exists():
-                      rows.append((html_file, href, "FAIL", f"missing target: {resolved.relative_to(docs_root)}"))
-                      continue
-
-                  if anchor:
-                      if has_anchor(resolved, anchor):
-                          rows.append((html_file, href, "PASS", f"target and anchor found: {resolved.relative_to(docs_root)}#{anchor}"))
-                      else:
-                          rows.append((html_file, href, "FAIL", f"target found, anchor missing: {resolved.relative_to(docs_root)}#{anchor}"))
-                  else:
-                      rows.append((html_file, href, "PASS", f"target found: {resolved.relative_to(docs_root)}"))
-
-          pass_count = sum(1 for _, _, status, _ in rows if status == "PASS")
-          fail_count = sum(1 for _, _, status, _ in rows if status == "FAIL")
-          skip_count = sum(1 for _, _, status, _ in rows if status == "SKIP")
-
-          print("Debug link inspection (docs/*.html href links)")
-          print(f"Total links: {len(rows)} | PASS: {pass_count} | FAIL: {fail_count} | SKIP: {skip_count}")
-          for source, href, status, details in rows:
-              source_rel = source.relative_to(docs_root)
-              print(f"[{status}] {source_rel}: {href} -> {details}")
-          PY
-
-          {
-            echo '# Link Checker Report (@untitaker/hyperlink)'
-            echo ''
-            echo "- Exit code: ${exit_code}"
-            echo '- Target: docs/'
-            echo '- Sources: .hyperlink-sources/ (Markdown files only, with exclusions)'
-            echo ''
-            echo '## Hyperlink raw output'
-            echo ''
-            echo '```text'
-            cat hyperlink-report.txt
-            echo '```'
-            echo ''
-            echo '## Verbose debug output'
-            echo ''
-            echo '```text'
-            cat hyperlink-debug.txt
-            echo '```'
-          } > hyperlink-out.md
-
-          echo "exit_code=${exit_code}" >> "$GITHUB_OUTPUT"
-
-      - name: Print hyperlink report
-        if: always()
-        run: |
-          cat hyperlink-report.txt
-          echo
-          cat hyperlink-debug.txt
-
-      - name: Create Issue From File
-        if: steps.hyperlink.outputs.exit_code != 0
-        uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6.0.0
+      - name: Check links and anchors
+        uses: untitaker/hyperlink@0.3.2
         with:
-          title: Link Checker Report (@untitaker/hyperlink)
-          content-filepath: ./hyperlink-out.md
-          labels: report, automated issue
+          args: docs/ --check-anchors --sources .
