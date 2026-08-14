@@ -93,6 +93,8 @@ jobs:
                   super().__init__()
                   self.links = []
               def handle_starttag(self, tag, attrs):
+                  if tag not in ("a", "area"):
+                      return
                   attrs = dict(attrs)
                   href = attrs.get("href")
                   if href:
