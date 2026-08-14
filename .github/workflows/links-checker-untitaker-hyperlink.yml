@@ -31,7 +31,16 @@ jobs:
       - name: Build docs
         run: npm run docs
 
+      - name: Collect Markdown sources
+        run: |
+          rm -rf .hyperlink-sources
+          mkdir -p .hyperlink-sources
+          git ls-files -- '*.md' | while read -r file; do
+            mkdir -p ".hyperlink-sources/$(dirname "$file")"
+            cp "$file" ".hyperlink-sources/$file"
+          done
+
       - name: Check links and anchors
         uses: untitaker/hyperlink@0.3.2
         with:
-          args: docs/ --check-anchors --sources .
+          args: docs/ --check-anchors --sources .hyperlink-sources
