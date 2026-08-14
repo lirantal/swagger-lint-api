@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="https://www.npmjs.org/package/swagger-lint-api"><img src="https://badgen.net/npm/v/swagger-lint-api" alt="npm version"/></a>
-  <a href="https://www.npmjs.org/package/swagger-lint-apidc"><img src="https://badgen.net/npm/v/swagger-lint-api" alt="npm version"/></a>
+  <a href="https://www.npmjs.org/package/swagger-lint-apidc"><img src="https://badgen.net/npm/v/swagger-lint-api" alt="npm version"/></a> 
   <a href="https://www.npmjs.org/package/swagger-lint-api"><img src="https://badgen.net/npm/license/swagger-lint-api" alt="license"/></a>
   <a href="https://www.npmjs.org/package/swagger-lint-api"><img src="https://badgen.net/npm/dt/swagger-lint-api" alt="downloads"/></a>
   <a href="https://github.com/lirantal/swagger-lint-api/actions/workflows/ci.yml"><img src="https://github.com/lirantal/swagger-lint-api/actions/workflows/ci.yml/badge.svg?branch=master" alt="build"/></a>
