@@ -55,6 +55,7 @@ jobs:
             --exclude='build/Release/' \
             --exclude='.npm/' \
             --exclude='.vuepress/dist/' \
+            --exclude='.hyperlink-sources/' \
             --exclude='*' \
             ./ .hyperlink-sources/
 
