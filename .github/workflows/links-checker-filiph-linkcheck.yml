@@ -26,3 +26,7 @@ jobs:
           
       - name: Markup Link Checker (mlc)
         uses: becheran/mlc@v1
+        with:  
+          args: >-
+            ./README.md
+            -H "User-Agent: Mozilla/5.0"
