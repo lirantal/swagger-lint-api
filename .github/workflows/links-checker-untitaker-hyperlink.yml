@@ -32,8 +32,34 @@ jobs:
       - name: Run hyperlink and build report
         id: hyperlink
         run: |
+          rm -rf .hyperlink-sources
+          mkdir -p .hyperlink-sources
+          rsync -a --prune-empty-dirs \
+            --include='*/' \
+            --include='*.md' \
+            --exclude='.git/' \
+            --exclude='node_modules/' \
+            --exclude='coverage/' \
+            --exclude='.nyc_output/' \
+            --exclude='.next/' \
+            --exclude='.nuxt/' \
+            --exclude='.serverless/' \
+            --exclude='.dynamodb/' \
+            --exclude='.fusebox/' \
+            --exclude='.cache/' \
+            --exclude='bower_components/' \
+            --exclude='jspm_packages/' \
+            --exclude='typings/' \
+            --exclude='.grunt/' \
+            --exclude='lib-cov/' \
+            --exclude='build/Release/' \
+            --exclude='.npm/' \
+            --exclude='.vuepress/dist/' \
+            --exclude='*' \
+            ./ .hyperlink-sources/
+
           set +e
-          npx -y @untitaker/hyperlink docs/ --check-anchors --github-actions 2>&1 | tee hyperlink-report.txt
+          npx -y @untitaker/hyperlink docs/ --check-anchors --sources .hyperlink-sources --github-actions 2>&1 | tee hyperlink-report.txt
           exit_code=${PIPESTATUS[0]}
           set -e
 
@@ -42,6 +68,7 @@ jobs:
             echo ''
             echo "- Exit code: ${exit_code}"
             echo '- Target: docs/'
+            echo '- Sources: .hyperlink-sources/ (Markdown files only, with exclusions)'
             echo ''
             echo '```text'
             cat hyperlink-report.txt
@@ -50,63 +77,10 @@ jobs:
 
           echo "exit_code=${exit_code}" >> "$GITHUB_OUTPUT"
 
-      - name: Run lychee on Markdown/HTML/RST and build report
-        id: markdown_links
-        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
-        with:
-          fail: false
-          failIfEmpty: false
-          output: markdown-links-out.md
-          args: >-
-            --verbose --no-progress './**/*.md' './**/*.html' './**/*.rst'
-            --exclude-path '(^|/)\.git/'
-            --exclude-path '(^|/)node_modules/'
-            --exclude-path '(^|/)coverage/'
-            --exclude-path '(^|/)\.nyc_output/'
-            --exclude-path '(^|/)\.next/'
-            --exclude-path '(^|/)\.nuxt/'
-            --exclude-path '(^|/)\.serverless/'
-            --exclude-path '(^|/)\.dynamodb/'
-            --exclude-path '(^|/)\.fusebox/'
-            --exclude-path '(^|/)\.cache/'
-            --exclude-path '(^|/)bower_components/'
-            --exclude-path '(^|/)jspm_packages/'
-            --exclude-path '(^|/)typings/'
-            --exclude-path '(^|/)\.grunt/'
-            --exclude-path '(^|/)lib-cov/'
-            --exclude-path '(^|/)build/Release/'
-            --exclude-path '(^|/)\.npm/'
-            --exclude-path '(^|/)\.vuepress/dist/'
-
-      - name: Build combined report
-        if: steps.hyperlink.outputs.exit_code != 0 || steps.markdown_links.outputs.exit_code != 0
-        run: |
-          {
-            echo '# Link Checker Report (@untitaker/hyperlink + lychee)'
-            echo ''
-            echo "## Hyperlink (docs/)"
-            echo ''
-            if [ -f hyperlink-out.md ]; then
-              cat hyperlink-out.md
-            else
-              echo 'No hyperlink report file was generated.'
-            fi
-            echo ''
-            echo '---'
-            echo ''
-            echo "## Lychee (Markdown/HTML/RST)"
-            echo ''
-            if [ -f markdown-links-out.md ]; then
-              cat markdown-links-out.md
-            else
-              echo 'No lychee report file was generated.'
-            fi
-          } > link-checkers-out.md
-
       - name: Create Issue From File
-        if: steps.hyperlink.outputs.exit_code != 0 || steps.markdown_links.outputs.exit_code != 0
+        if: steps.hyperlink.outputs.exit_code != 0
         uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6.0.0
         with:
-          title: Link Checker Report (@untitaker/hyperlink + lychee)
-          content-filepath: ./link-checkers-out.md
+          title: Link Checker Report (@untitaker/hyperlink)
+          content-filepath: ./hyperlink-out.md
           labels: report, automated issue
