@@ -1,5 +1,10 @@
 name: Linkspector
-on: [pull_request]
+# on: [pull_request]
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+  
 jobs:
   check-links:
     name: runner / linkspector
