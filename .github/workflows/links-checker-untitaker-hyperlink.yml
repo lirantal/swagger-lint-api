@@ -32,8 +32,35 @@ jobs:
       - name: Run hyperlink and build report
         id: hyperlink
         run: |
+          rm -rf .hyperlink-sources
+          mkdir -p .hyperlink-sources
+          rsync -a --prune-empty-dirs \
+            --include='*/' \
+            --include='*.md' \
+            --exclude='.git/' \
+            --exclude='node_modules/' \
+            --exclude='coverage/' \
+            --exclude='.nyc_output/' \
+            --exclude='.next/' \
+            --exclude='.nuxt/' \
+            --exclude='.serverless/' \
+            --exclude='.dynamodb/' \
+            --exclude='.fusebox/' \
+            --exclude='.cache/' \
+            --exclude='bower_components/' \
+            --exclude='jspm_packages/' \
+            --exclude='typings/' \
+            --exclude='.grunt/' \
+            --exclude='lib-cov/' \
+            --exclude='build/Release/' \
+            --exclude='.npm/' \
+            --exclude='.vuepress/dist/' \
+            --exclude='.hyperlink-sources/' \
+            --exclude='*' \
+            ./ .hyperlink-sources/
+
           set +e
-          npx -y @untitaker/hyperlink docs/ --check-anchors --github-actions 2>&1 | tee hyperlink-report.txt
+          npx -y @untitaker/hyperlink docs/ --check-anchors --sources .hyperlink-sources --github-actions 2>&1 | tee hyperlink-report.txt
           exit_code=${PIPESTATUS[0]}
           set -e
 
@@ -42,6 +69,7 @@ jobs:
             echo ''
             echo "- Exit code: ${exit_code}"
             echo '- Target: docs/'
+            echo '- Sources: .hyperlink-sources/ (Markdown files only, with exclusions)'
             echo ''
             echo '```text'
             cat hyperlink-report.txt
