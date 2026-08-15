@@ -32,6 +32,7 @@ jobs:
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
           args: --root-dir "$(pwd)" --cache --max-cache-age 1d .
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Issue From File
         if: steps.lychee.outputs.exit_code != 0
