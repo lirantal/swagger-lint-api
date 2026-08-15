@@ -31,7 +31,7 @@ jobs:
         id: lychee
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
-          args: --root-dir "$(pwd)" --cache --max-cache-age 1d . --max-retries 5 --retry-wait-time 60 --user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"  --remap 'npmjs.com/package/(.*) registry.npmjs.com/$1'
+          args: --root-dir "$(pwd)" --cache --max-cache-age 1d . --max-retries 5 --retry-wait-time 60 --user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"  --remap 'npmjs\.org/package/(.*) registry.npmjs.com/$1' --remap 'npmjs\.com/package/(.*) registry.npmjs.com/$1' --max-concurrency 1
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Issue From File
