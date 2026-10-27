@@ -1,6 +1,6 @@
 {
   "name": "swagger-lint-api",
-  "version": "0.0.0-development",
+  "version": "1.2.0",
   "description": "Linter for a Swagger JSON API spec",
   "main": "index.js",
   "engines": {
