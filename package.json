@@ -72,7 +72,7 @@
     "eslint-plugin-standard": "^5.0.0",
     "husky": "^9.1.7",
     "jest": "23.6",
-    "lint-staged": "^8.1.0",
+    "lint-staged": "^17.6.0",
     "lockfile-lint": "^5.0.1",
     "opn-cli": "^5.0.0",
     "prettier-standard": "^16.4.1",
